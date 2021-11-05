@@ -180,3 +180,11 @@ for (Integer i = 0; i < stageNameField.getPicklistValues().size(); i++) {
 ExampleBatch batch = new ExampleBatch();
 Database.executeBatch(batch);
 ```
+- Schedule a job using Anonymous Apex.
+
+```java
+ExampleBatchSchedule scheduledBatch = new ExampleBatchSchedule();
+// String sch = 'SECONDS MINUTES HOURS DAY_OF_MONTH MONTH DAY_OF_WEEK OPTIONAL_YEAR';
+String sch = '00 45 6-22 ? * * *';
+System.schedule('Example Batch', sch, scheduledBatch);
+```
