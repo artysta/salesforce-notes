@@ -1,4 +1,4 @@
-# #1 Relationships & relationship SOQL queries examples
+# # 1 Relationships & relationship SOQL queries examples
 
 There are two main relationship types in Salesforce Lookup Relationship and Master-Detail relationships. There are some differences betweent these relationships:
 
@@ -140,4 +140,43 @@ SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account
 ```
 ```sql
 SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account WHERE Id = '0010900000iMM6FAAW'
+```
+
+# # 2 Some useful Apex code snippets
+
+- Send an email + debug.
+
+```java
+String subject = 'Email Subject.';
+String body = 'Email Body.';
+String[] addresses = new String[] { 'test@mail.com' };
+
+Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+
+mail.setToAddresses(addresses);
+mail.setSubject(subject);
+mail.setPlainTextBody(body);
+
+Messaging.SendEmailResult[] results = Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+
+for (Messaging.SendEmailResult r : results) {
+    System.debug(r);
+}
+```
+
+- Get picklist values for picklist field (StageName field values of Opportunity standard object in this case).
+
+```java
+DescribeFieldResult stageNameField = Opportunity.StageName.getDescribe();
+
+for (Integer i = 0; i < stageNameField.getPicklistValues().size(); i++) {
+    System.debug(String.format(' StageName {0}: {1}', new List<String> { String.valueOf(i), stageNameField.getPicklistValues()[i].value }));
+}
+```
+
+- Run batch manually using Anonymous Apex.
+
+```java
+ExampleBatch batch = new ExampleBatch();
+Database.executeBatch(batch);
 ```
