@@ -142,7 +142,80 @@ SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account
 SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account WHERE Id = '0010900000iMM6FAAW'
 ```
 
-# # 2 Some useful Apex code snippets
+# #2 Batches & scheduled jobs
+
+The idea of Apex batch jobs is to work on the huge number (thousands / millions) of records. Apex Batch class has to implement Database.Batchable<sObject> interface and its 3 methods:
+
+ - **start** (pre-processing operations) - here the records are being collected
+ - **execute** - here some operations are performed on the provided records
+ - **finish** (post-processing operations) - this method is called once all operations are done
+
+Here is a pretty simple implementation of this interface. This batch just deletes every Opportunity with the stage name 'Closed Won' or 'Closed Lost'.
+
+```java
+public class OpportunitiesCleanerBatch implements Database.Batchable<sObject> {
+    public Database.QueryLocator start(Database.BatchableContext context) {
+        System.debug('Job started!');
+        return Database.getQueryLocator([SELECT StageName FROM Opportunity]);
+    }
+    
+    public void execute(Database.BatchableContext context, List<Opportunity> opportunities) {
+        List<Opportunity> opportunitiesToRemove = new List<Opportunity>();
+        
+        for (Opportunity o : opportunities) {
+            if (o.StageName == 'Closed Won' || o.StageName == 'Closed Lost') {
+                opportunitiesToRemove.add(o);
+            }
+        }
+        
+        delete opportunitiesToRemove;
+
+        System.debug(
+            String.format(
+                '{0} opportunities with the \"{1}\" or \"{2}\" stage name have been deleted.',
+                new List<String> { String.valueOf(opportunitiesToRemove.size()), 'Closed Won', 'Closed Lost' }
+            )
+        );
+    }
+    
+    public void finish(Database.BatchableContext context) {
+        System.debug('Job finished!');
+    }
+}
+```
+
+Here is the code that allows to run the batch above from Developer Console or within another class:
+
+```java
+OpportunitiesCleanerBatch oppCleanerBatch = new OpportunitiesCleanerBatch();
+Database.executeBatch(oppCleanerBatch);
+```
+
+The interface, that works really good with batches is Schedulable interface. It allows to schedule an instance of the Apex class to run at a specific time.
+
+Here is implementation of Schedulable interface that runs OpportunitiesCleanerBatch.
+
+```java
+public class OpportunitiesCleanerBatchSchedule implements Schedulable {
+    public void execute(SchedulableContext context) {
+        OpportunitiesCleanerBatch oppCleanerBatch = new OpportunitiesCleanerBatch();
+        Database.executeBatch(oppCleanerBatch);
+    }
+}
+```
+
+There are two possibilities to schedule a job. Obviously you can run the code from the Developer Console or within another class.
+
+```java
+OpportunitiesCleanerBatchSchedule scheduledBatch = new OpportunitiesCleanerBatchSchedule();
+// String sch = 'SECONDS MINUTES HOURS DAY_OF_MONTH MONTH DAY_OF_WEEK OPTIONAL_YEAR';
+String sch = '00 45 6-22 ? * * *';
+System.schedule('Opportunities Cleaner Batch', sch, scheduledBatch);
+```
+
+You can also use UI to do this: Setup -> Apex Jobs -> Apex Classes -> Schedule Apex. There you have to add job name, select proper class and choose specific time and how often you want the job to run.
+
+# # 3 Some useful Apex code snippets
 
 - Send an email + debug.
 
