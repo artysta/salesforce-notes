@@ -261,3 +261,106 @@ ExampleBatchSchedule scheduledBatch = new ExampleBatchSchedule();
 String sch = '00 45 6-22 ? * * *';
 System.schedule('Example Batch', sch, scheduledBatch);
 ```
+
+# #3 Aura Components + Apex Controllers.
+
+Below you can find an Aura Component which is using Apex Controller to read and display data. It doesn't look so good, but it is one of the simplest examples. In this case data loads after clicking the **Get Opportunities** button.
+
+<img src="./screenshots/aura-1.png" alt="aura-1.png"/>
+
+Aura Component: opportunitiesList.cmp
+
+```html
+<aura:component implements="flexipage:availableForAllPageTypes" controller="OpportunitiesController">
+    <aura:attribute name="opportunities" type="Opportunity[]"/>
+    <!-- We are calling component controller method here (NOT Apex method!) -->
+    <button onclick="{!c.getOpportunities}">Get Opportunities</button>
+    <p>Opportunities list:</p>
+    <ul>
+        <aura:iteration var="opportunity" items="{!v.opportunities}">
+            <li>Id: {!opportunity.Id}, Name: {!opportunity.Name}, StageName: {!opportunity.StageName}</li>
+        </aura:iteration>
+    </ul>
+</aura:component>
+```
+
+JavaScript Controller: opportunitiesListController.js
+
+```js
+({
+    getOpportunities: function(component, event, helper){
+        // We are calling Apex controller method here.
+        var action = component.get("c.getOpportunitiesList");
+        action.setCallback(this, function(response){
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                component.set("v.opportunities", response.getReturnValue());
+            }
+        });
+        $A.enqueueAction(action);
+    }
+})
+```
+
+Apex Controller: OpportunitiesController.cls
+
+```java
+public with sharing class OpportunitiesController {
+    @AuraEnabled
+    public static List<Opportunity> getOpportunitiesList() {
+        return [SELECT Id, Name, StageName, CreatedDate
+                FROM Opportunity
+                ORDER BY CreatedDate DESC
+                LIMIT 10];
+    }
+}
+```
+
+Of course we can use datatable to achieve much better appearance. In this case there is no need to click the button to load data.
+
+<img src="./screenshots/aura-2.png" alt="aura-2.png"/>
+
+Aura Component: opportunitiesList.cmp
+
+```html
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="OpportunitiesController" access="global">
+    <aura:attribute name="columns" type="list"/>
+    <aura:attribute name="opportunities" type="Opportunity[]"/>
+    <!-- We are calling component controller method here (NOT Apex method!) -->
+    <aura:handler name='init' action="{!c.getOpportunities}" value="{!this}"/>
+    <!-- <button onclick="{!c.getOpportunities}">Get Opportunities</button> -->
+    <lightning:card title="Opportunities List">
+        <lightning:datatable keyField="id"
+                             data="{!v.opportunities}"
+                             columns="{!v.columns}"
+                             hideCheckboxColumn="true"
+                             maxColumnWidth="1000"
+                             minColumnWidth="150"/>
+    </lightning:card>
+</aura:component>
+```
+
+JavaScript Controller: opportunitiesListController.js
+
+```js
+({
+    getOpportunities: function (component, event, helper) {
+        component.set('v.columns', [
+            {label: 'Id', fieldName: 'Id', type: 'text'},
+            {label: 'Name', fieldName: 'Name', type: 'text'},
+            {label: 'Stage Name', fieldName: 'StageName', type: 'text'},
+            {label: 'Creation Date', fieldName: 'CreatedDate', type: 'date'},
+        ]);
+            
+        // We are calling Apex controller method here.
+        var action = component.get("c.getOpportunitiesList");
+        action.setCallback(this, function(response){
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                component.set("v.opportunities", response.getReturnValue());
+            }
+        });
+        $A.enqueueAction(action);
+    }
+})
+```
