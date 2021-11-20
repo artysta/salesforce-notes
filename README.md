@@ -364,3 +364,147 @@ JavaScript Controller: opportunitiesListController.js
     }
 })
 ```
+
+# #4 Object Oriented Programming in Apex
+
+What is Apex?
+
+As the Salesforce documentation says:
+
+> Apex is a strongly typed, object-oriented programming language that allows developers to execute flow and transaction control statements on Salesforce servers in conjunction with calls to the API
+
+It is just an OOP language that is pretty similar to Java or C#.
+
+Below you can find some informations about classes and interfaces:
+
+<center>
+    <table>
+    <tbody>
+        <tr>
+            <th></th>
+            <th>Virtual</th>
+            <th>Abstract</th>
+            <th>Interface</th>
+        </tr>
+        <tr>
+            <td>implementation</td>
+            <td>full class implementation</td>
+            <td>partial class implementation</td>
+            <td>it's just a "contract"</td>
+        </tr>
+        <tr>
+            <td>keyword</td>
+            <td>extends</td>
+            <td>extends</td>
+            <td>implements</td>
+        </tr>
+        <tr>
+            <td>can have variables and properties</td>
+            <td>yes</td>
+            <td>yes</td>
+            <td>no</td>
+        </tr>
+        <tr>
+            <td>can have defined methods</td>
+            <td>yes</td>
+            <td>yes</td>
+            <td>no</td>
+        </tr>
+        <tr>
+            <td>can be instantiated (directly)</td>
+            <td>yes</td>
+            <td>no</td>
+            <td>no</td>
+        </tr>
+        <tr>
+            <td>can have abstract methods</td>
+            <td>no</td>
+            <td>yes</td>
+            <td>yes</td>
+        </tr>
+    </table>
+</center>
+
+Here is really simple example, how this all works together in Apex:
+
+Vehicle.cls
+
+```java
+public interface Tuningable {
+    // Interface methods cannot have a body.
+	void tuning();
+}
+```
+
+```java
+// This class is abstract so it cannot be instantiated. It can be extended.
+public abstract class Vehicle {
+    // Automatic property - like in C#.
+    public String Name { get; set; }
+    public String Color { get; set; }
+    
+    public Vehicle(String name, String color) {
+        this.Name = name;
+        this.Color = color;
+    }
+    
+	// Abstract method that has to be implemented by the subclass. Abstract methods have no body.
+    public abstract Integer getMaxSpeed();
+    
+    // Virtual method can (but not has to) be overridden by the subclass.
+    public virtual String getInfo() {
+        return String.format('I am a {0} {1}.', new List<String> { this.Color, this.Name });
+    }
+}
+```
+
+BaseCar.cls
+
+```java
+// This is a virtual class so it can be extended by other classes. It also can be instantiated.
+public virtual class BaseCar extends Vehicle {
+    public Integer MaxSpeed { get; set; }
+    
+    // We can call super class constructor by using 'super' keyword - like in Java.
+    public BaseCar(String name, String color, Integer maxSpeed) {
+        super(name, color);
+        this.MaxSpeed = maxSpeed;
+    }
+    
+    // We can call super class method by using 'super' keyword - like in Java.
+    public override Integer getMaxSpeed() {
+        return this.MaxSpeed;
+    }
+    
+    // We can call super class method by using 'super' keyword - like in Java.
+    // We have to use 'override' keyword if we want to override superclass method.
+    public override String getInfo() {
+        return String.format('I am a {0} {1}. My max speed is km/h.',
+                             new List<String> { super.getInfo(), String.valueOf(this.MaxSpeed) });
+    }
+}
+```
+
+SportsCar.cls
+
+```java
+// We cannot extend this class. We can extend class only if it is abstract or virtual.
+public class SportsCar extends BaseCar implements Tuningable {
+    public Boolean HasTurbo { get; set; }
+    
+    public SportsCar(String name, String color, Integer maxSpeed) {
+        super(name, color, maxSpeed);
+    }
+    
+    // We can call another constructor by using 'this' keyword - like in Java.
+    public SportsCar(String name, String color, Integer maxSpeed, Boolean hasTurbo) {
+        this(name, color, maxSpeed);
+        this.hasTurbo = hasTurbo;
+    }
+    
+    // We don't have to (and even cannot) use 'override' keyword if we are implementing interface method.
+    public void tuning() {
+        maxSpeed += 10;
+    }
+}
+```
