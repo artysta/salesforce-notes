@@ -1,56 +1,32 @@
-# # 1 Relationships & relationship SOQL queries examples
+# #1 Relationships & relationship SOQL queries examples.
 
 There are two main relationship types in Salesforce Lookup Relationship and Master-Detail relationships. There are some differences betweent these relationships:
 
 <center>
     <table>
         <tr>
-            <th>
-                Lookup Relationship
-            </th>
-            <th>
-                Master-Detail Relationship
-            </th>
+            <th>Lookup Relationship</th>
+            <th>Master-Detail Relationship</th>
         </tr>
         <tr>
-            <td>
-                up to 25 per one object
-            </td>
-            <td>
-                up to 2 per one object
-            </td>
+            <td>up to 25 per one object</td>
+            <td>up to 2 per one object</td>
         </tr>
         <tr>
-            <td>
-                parent is not a required field
-            </td>
-            <td>
-                parent field on a child is required
-            </td>
+            <td>parent is not a required field</td>
+            <td>parent field on a child is required</td>
         </tr>
         <tr>
-            <td>
-                deleting a parent does not delete a child
-            </td>
-            <td>
-                deleting a parent automatically deletes a child
-            </td>
+            <td>deleting a parent does not delete a child</td>
+            <td>deleting a parent automatically deletes a child</td>
         </tr>
         <tr>
-            <td>
-                can be multiple layers deep
-            </td>
-            <td>
-                a child of one master detail relationship cannot be the parent of another one
-            </td>
+            <td>can be multiple layers deep</td>
+            <td>a child of one master detail relationship cannot be the parent of another one</td>
         </tr>
         <tr>
-            <td>
-                no impact on a security and access
-            </td>
-            <td>
-                access to a parent determines access to a children
-            </td>
+            <td>no impact on a security and access</td>
+            <td>access to a parent determines access to a children</td>
         </tr>
     </table>
 </center>
@@ -67,13 +43,17 @@ Child-to-parent queries:
 SELECT Name, Phone, Account.Id, Account.Name FROM Contact
 ```
 
-<img src="./screenshots/screenshot-1.png" alt="screen-1.png"/>
+<p align="center">
+    <img src="./screenshots/screenshot-1.png" alt="screen-1.png"/>
+</p>
 
 ```sql
 SELECT Name, Phone, Account.Id, Account.Name FROM Contact WHERE Account.Id = '0010900000iMM6GAAW'
 ```
 
-<img src="./screenshots/./screenshot-2.png" alt="screen-2.png"/>
+<p align="center">
+    <img src="./screenshots/./screenshot-2.png" alt="screen-2.png"/>
+</p>
 
 Parent-to-child queries:
 
@@ -81,13 +61,17 @@ Parent-to-child queries:
 SELECT Id, Name, (SELECT Name, Phone FROM Contacts) FROM Account
 ```
 
-<img src="./screenshots/./screenshot-3.png" alt="screen-3.png"/>
+<p align="center">
+    <img src="./screenshots/./screenshot-3.png" alt="screen-3.png"/>
+</p>
 
 ```sql
 SELECT Id, Name, (SELECT Name, Phone FROM Contacts) FROM Account WHERE Id = '0010900000iMM6DAAW'
 ```
 
-<img src="./screenshots/./screenshot-4.png" alt="screen-4.png"/>
+<p align="center">
+    <img src="./screenshots/./screenshot-4.png" alt="screen-4.png"/>
+</p>
 
 ### Custom objects:
 
@@ -142,7 +126,7 @@ SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account
 SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account WHERE Id = '0010900000iMM6FAAW'
 ```
 
-# #2 Batches & scheduled jobs
+# #2 Batches & scheduled jobs.
 
 The idea of Apex batch jobs is to work on the huge number (thousands / millions) of records. Apex Batch class has to implement Database.Batchable<sObject> interface and its 3 methods:
 
@@ -215,7 +199,7 @@ System.schedule('Opportunities Cleaner Batch', sch, scheduledBatch);
 
 You can also use UI to do this: Setup -> Apex Jobs -> Apex Classes -> Schedule Apex. There you have to add job name, select proper class and choose specific time and how often you want the job to run.
 
-# # 3 Some useful Apex code snippets
+# #3 Some useful Apex code snippets.
 
 - Send an email + debug.
 
@@ -262,13 +246,15 @@ String sch = '00 45 6-22 ? * * *';
 System.schedule('Example Batch', sch, scheduledBatch);
 ```
 
-# #3 Aura Components + Apex Controllers.
+# #4 Aura Components + Apex Controllers.
 
 Below you can find an Aura Component which is using Apex Controller to read and display data. It doesn't look so good, but it is one of the simplest examples. In this case data loads after clicking the **Get Opportunities** button.
 
-<img src="./screenshots/aura-1.png" alt="aura-1.png"/>
+<p align="center">
+    <img src="./screenshots/aura-1.png" alt="aura-1.png"/>
+</p>
 
-Aura Component: opportunitiesList.cmp
+###### Aura Component: opportunitiesList.cmp
 
 ```html
 <aura:component implements="flexipage:availableForAllPageTypes" controller="OpportunitiesController">
@@ -284,7 +270,7 @@ Aura Component: opportunitiesList.cmp
 </aura:component>
 ```
 
-JavaScript Controller: opportunitiesListController.js
+###### JavaScript Controller: opportunitiesListController.js
 
 ```js
 ({
@@ -302,7 +288,7 @@ JavaScript Controller: opportunitiesListController.js
 })
 ```
 
-Apex Controller: OpportunitiesController.cls
+###### Apex Controller: OpportunitiesController.cls
 
 ```java
 public with sharing class OpportunitiesController {
@@ -318,9 +304,11 @@ public with sharing class OpportunitiesController {
 
 Of course we can use datatable to achieve much better appearance. In this case there is no need to click the button to load data.
 
-<img src="./screenshots/aura-2.png" alt="aura-2.png"/>
+<p align="center">
+    <img src="./screenshots/aura-2.png" alt="aura-2.png"/>
+</p>
 
-Aura Component: opportunitiesList.cmp
+###### Aura Component: opportunitiesList.cmp
 
 ```html
 <aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="OpportunitiesController" access="global">
@@ -340,7 +328,7 @@ Aura Component: opportunitiesList.cmp
 </aura:component>
 ```
 
-JavaScript Controller: opportunitiesListController.js
+###### JavaScript Controller: opportunitiesListController.js
 
 ```js
 ({
@@ -365,7 +353,7 @@ JavaScript Controller: opportunitiesListController.js
 })
 ```
 
-# #4 Object Oriented Programming in Apex
+# #5 Object Oriented Programming in Apex.
 
 What is Apex?
 
@@ -427,7 +415,7 @@ Below you can find some informations about classes and interfaces:
 
 Here is really simple example, how this all works together in Apex:
 
-Vehicle.cls
+###### Tuningable.cls
 
 ```java
 public interface Tuningable {
@@ -435,6 +423,8 @@ public interface Tuningable {
 	void tuning();
 }
 ```
+
+###### Vehicle.cls
 
 ```java
 // This class is abstract so it cannot be instantiated. It can be extended.
@@ -458,7 +448,7 @@ public abstract class Vehicle {
 }
 ```
 
-BaseCar.cls
+###### BaseCar.cls
 
 ```java
 // This is a virtual class so it can be extended by other classes. It also can be instantiated.
@@ -485,7 +475,7 @@ public virtual class BaseCar extends Vehicle {
 }
 ```
 
-SportsCar.cls
+###### SportsCar.cls
 
 ```java
 // We cannot extend this class. We can extend class only if it is abstract or virtual.
