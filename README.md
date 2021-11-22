@@ -246,6 +246,13 @@ String sch = '00 45 6-22 ? * * *';
 System.schedule('Example Batch', sch, scheduledBatch);
 ```
 
+- Easy way to get set of object Ids.
+	
+```java
+List<SObject> opportunities = [SELECT Id, Name FROM Opportunity LIMIT 10];
+Set<Id> opportunitiesIds = (new Map<Id, SObject>(opportunities)).keySet();	
+```
+
 # #4 Aura Components + Apex Controllers.
 
 Below you can find an Aura Component which is using Apex Controller to read and display data. It doesn't look so good, but it is one of the simplest examples. In this case data loads after clicking the **Get Opportunities** button.
