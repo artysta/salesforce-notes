@@ -505,3 +505,68 @@ public class SportsCar extends BaseCar implements Tuningable {
     }
 }
 ```
+
+# #5 Apex Governor Limits.
+
+What are the Apex Governor Limits?
+
+As the Salesforce documentation says:
+
+> Because Apex runs in a multitenant environment, the Apex runtime engine strictly enforces limits so that runaway Apex code or processes don’t monopolize shared resources.
+
+Below you can find one of the most common limits in Salesforce (the table is not complete):
+
+<center>
+<table>
+    <tr>
+        <th>Description</th>
+        <th>Synchronous Limit</th>
+        <th>Asynchronous Limit</th>
+    </tr>
+    <tr>
+        <td>number of SOQL queries</td>
+        <td>100</td>
+        <td>200</td>
+    </tr>
+    <tr>
+        <td>number of records retrieved by SOQL queries</td>
+        <td>50,000</td>
+        <td>50,000</td>
+    </tr>
+    <tr>
+        <td>number of records retrieved by Database.getQueryLocator</td>
+        <td>10,000</td>
+        <td>10,000</td>
+    </tr>
+    <tr>
+        <td>number of SOSL queries</td>
+        <td>20</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>number of records retrieved by a single SOSL query</td>
+        <td>2,000</td>
+        <td>2,000</td>
+    </tr>
+    <tr>
+        <td>number of DML statements issued</td>
+        <td>150</td>
+        <td>150</td>
+    </tr>
+    <tr>
+        <td>number of records processed as a result of DML statements</td>
+        <td>10,000</td>
+        <td>10,000</td>
+    </tr>
+    <tr>
+        <td>heap size</td>
+        <td>6 MB</td>
+        <td>12 MB</td>
+    </tr>
+    <tr>
+        <td>maximum CPU time on the Salesforce servers</td>
+        <td>10,000 ms</td>
+        <td>60,000 ms</td>
+    </tr>
+</table>
+</center>
