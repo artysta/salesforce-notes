@@ -570,3 +570,22 @@ Below you can find one of the most common limits in Salesforce (the table is not
     </tr>
 </table>
 </center>
+	
+# #6 Queues
+
+// TODO
+
+```java
+String userId = UserInfo.getUserId();
+
+// Get Queue using Current User Id.
+GroupMember groupMember = [SELECT Id, Group.Name, UserOrGroupId, GroupId
+			   FROM GroupMember
+			   WHERE UserOrGroupId = :userId
+			   LIMIT 1];
+
+// Get all cases where Queue is the owner.
+List<Case> cases = [SELECT Id, Status FROM Case WHERE OwnerId = :groupMember.GroupId];
+
+System.debug('Cases for Queue "' + groupMember.Group.Name + '": ' + cases);
+```
