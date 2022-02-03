@@ -25,7 +25,8 @@ There are two main relationship types in Salesforce Lookup Relationship and Mast
             <td>a child of one master detail relationship cannot be the parent of another one</td>
         </tr>
         <tr>
-            <td>no impact on a security and access</td>
+            <td>no impact on a security and 
+		</td>
             <td>access to a parent determines access to a children</td>
         </tr>
     </table>
@@ -571,7 +572,97 @@ Below you can find one of the most common limits in Salesforce (the table is not
 </table>
 </center>
 	
-# #6 Queues
+# #6 Apex Triggers.
+
+Apex Trigger is a code that executes before or after any operations are performed on the specific record.
+
+Below you can find an example of pretty simple trigger that updates Vehicle name by appending current user name to it.
+
+```java
+trigger VehicleTrigger on Vehicle__c (before insert) {
+    for (Vehicle__c vehicle : Trigger.New) {
+        vehicle.Name += ' of ' +  System.UserInfo.getUserName();
+    }
+}
+```
+
+Possibly types of operations are:
+
+- insert
+- update
+- delete
+- merge
+- upsert
+- undelete
+
+There are some Trigger context variables that allow you to check which operation fired the trigger or if it was fired before or after the records were saved:
+
+<center>
+    <table>
+        <tr>
+            <th>Variable</th>
+            <th>Returns</th>
+        </tr>
+        <tr>
+            <td>isInsert</td>
+            <td>true if the trigger was fired due to an insert operation</td>
+        </tr>
+        <tr>
+            <td>isUpdate</td>
+            <td>true if the trigger was fired due to an update operation</td>
+        </tr>
+        <tr>
+            <td>isDelete</td>
+            <td>true if the trigger was fired due to a delete operation</td>
+        </tr>
+        <tr>
+            <td>isUndelete</td>
+            <td>true if the trigger was fired after a record is recovered from the Recycle Bin</td>
+        </tr>
+        <tr>
+            <td>isBefore</td>
+            <td>true if the trigger was fired before any record was saved</td>
+        </tr>
+        <tr>
+            <td>isAfter</td>
+            <td>true if this trigger was fired after all records were saved</td>
+        </tr>
+    </table>
+</center>
+
+There are also some variables, that allow you to access the records:
+
+<center>
+    <table>
+        <tr>
+            <th>Variable</th>
+            <th>Returns</th>
+            <th>Records available in</th>
+        </tr>
+        <tr>
+            <td>new</td>
+            <td>a list of the new versions of the sObject records</td>
+            <td>insert, update, undelete (and can be modified only before)</td>
+        </tr>
+        <tr>
+            <td>newMap</td>
+            <td>a map of IDs to the new versions of the sObject records</td>
+            <td>before update, after insert, after update, after undelete</td>
+        </tr>
+        <tr>
+            <td>old</td>
+            <td>a list of the old versions of the sObject records</td>
+            <td>update, delete</td>
+        </tr>
+        <tr>
+            <td>oldMap</td>
+            <td>a map of IDs to the old versions of the sObject records</td>
+            <td>update and delete</td>
+        </tr>
+    </table>
+</center>
+
+# #7 Queues
 
 // TODO
 
