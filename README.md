@@ -680,3 +680,76 @@ List<Case> cases = [SELECT Id, Status FROM Case WHERE OwnerId = :groupMember.Gro
 
 System.debug('Cases for Queue "' + groupMember.Group.Name + '": ' + cases);
 ```
+
+# #8 Schema class
+
+As the Salesforce documentation says Schema class:
+>Contains methods for obtaining schema describe information.
+
+Useful examples:
+
+Get metadata information about custom apps.
+
+```java
+Schema.DescribeTabSetResult[] results = Schema.describeTabs();
+
+for (Schema.DescribeTabSetResult result : results) {
+    System.debug('Label: ' + result.getLabel());
+}
+```
+
+```console
+03:36:27:072 USER_DEBUG [4]|DEBUG|Label: Sales
+03:36:27:072 USER_DEBUG [4]|DEBUG|Label: Service
+03:36:27:072 USER_DEBUG [4]|DEBUG|Label: Marketing
+```
+
+---
+
+Get sObjects names.
+
+```java
+Map<String, Schema.SObjectType> sObjectsMap = Schema.getGlobalDescribe();
+
+for (String key : sObjectsMap.keySet()) {
+	Schema.DescribeSObjectResult result = sObjectsMap.get(key).getDescribe();
+	System.debug('SObject name: ' + result.getName());
+}
+```
+
+```console
+04:05:09:071 USER_DEBUG [5]|DEBUG|SObject name: OpportunityStage
+04:05:09:071 USER_DEBUG [5]|DEBUG|SObject name: LeadStatus
+04:05:09:072 USER_DEBUG [5]|DEBUG|SObject name: CaseStatus
+```
+
+---
+
+Get picklist entries.
+
+```java
+Schema.DescribeFieldResult describeFieldResult = Account.Industry.getDescribe();
+List<Schema.PicklistEntry> picklistEntries = describeFieldResult.getPicklistValues();
+
+for (Schema.PicklistEntry picklistEntry : picklistEntries) {
+    System.debug('Picklist entry: ' + picklistEntry);
+}
+```
+```console
+10:38:41:007 USER_DEBUG [5]|DEBUG|Picklist entry: Schema.PicklistEntry[getLabel=Consulting;getValue=Consulting;isActive=true;isDefaultValue=false;]
+10:38:41:007 USER_DEBUG [5]|DEBUG|Picklist entry: Schema.PicklistEntry[getLabel=Education;getValue=Education;isActive=true;isDefaultValue=false;]
+10:38:41:007 USER_DEBUG [5]|DEBUG|Picklist entry: Schema.PicklistEntry[getLabel=Electronics;getValue=Electronics;isActive=true;isDefaultValue=false;]
+```
+
+---
+
+Get type of sObject.
+
+```java
+Schema.DescribeSObjectResult describeResult = Account.sObjectType.getDescribe();
+System.debug('SObject type: ' + describeResult.getSObjectType());
+```
+
+```console
+11:08:36:015 USER_DEBUG [2]|DEBUG|SObject type: Account
+```
