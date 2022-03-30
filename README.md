@@ -753,3 +753,81 @@ System.debug('SObject type: ' + describeResult.getSObjectType());
 ```console
 11:08:36:015 USER_DEBUG [2]|DEBUG|SObject type: Account
 ```
+
+# #8 Apex data types.
+
+Primitive data types in Apex.
+
+<center>
+    <table>
+        <tr>
+            <th>Data Type</th>
+            <th>Description</th>
+            <th>Usage example</th>
+        </tr>
+        <tr>
+            <td>Blob</td>
+            <td>-</td>
+            <td>
+            String myString = 'StringToBlob';
+            Blob myBlob = Blob.valueof(myString);
+            System.assertEquals('StringToBlob', myBlob.toString());
+            </td>
+        </tr>
+        <tr>
+            <td>Boolean</td>
+            <td>-</td>
+            <td>Boolean isValid = true;</td>
+        </tr>
+        <tr>
+            <td>Date</td>
+            <td>-</td>
+            <td>Date myDate = Date.newInstance(2022, 2, 18); // 2022-02-18 00:00:00</td>
+        </tr>
+        <tr>
+            <td>DateTime</td>
+            <td>-</td>
+            <td>DateTime myDateTime = DateTime.newInstance(1999, 2, 11, 8, 6, 16); // 2022-02-18 13:29:15</td>
+        </tr>
+        <tr>
+            <td>Decimal</td>
+            <td>-</td>
+            <td>Decimal phi = 1.618033;</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>-</td>
+            <td>Double pi = 3.14159;</td>
+        </tr>
+        <tr>
+            <td>Id</td>
+            <td>-</td>
+            <td>0017Q000008Yo6JQAS</td>
+        </tr>
+        <tr>
+            <td>Integer</td>
+            <td>-</td>
+            <td>Integer count = 15;</td>
+        </tr>
+        <tr>
+            <td>Long</td>
+            <td>-</td>
+            <td>Long amount = 1337;</td>
+        </tr>
+        <tr>
+            <td>Object</td>
+            <td>-</td>
+            <td>Object color = 'Red';</td>
+        </tr>
+        <tr>
+            <td>String</td>
+            <td>-</td>
+            <td>String name = 'Adrian';</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td>-</td>
+            <td>Time myTime = Time.newInstance(13, 47, 35, 570); // 13:47:35.570Z</td>
+        </tr>
+    </table>
+</center>
