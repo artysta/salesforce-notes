@@ -571,7 +571,65 @@ Below you can find one of the most common limits in Salesforce (the table is not
     </tr>
 </table>
 </center>
-	
+
+Exceeding the limit will cause an exceptions to occur. Some of examples:
+
+Too many SOQL queries (synchronous limit):
+
+```java
+// 'System.LimitException: Too many SOQL queries: 101' will be thrown because max number of (synchronous) SOQL queries is equal to 100.
+static void queryCases() {
+    for (Integer i = 0; i < 101; i++) {
+        Case c = [SELECT Id FROM Case];
+    }
+}
+```
+
+Too many SOQL queries (asynchronous limit):
+
+```java
+// 'System.LimitException: Too many SOQL queries: 201' will be thrown because max number of (asynchronous) SOQL queries is equal to 200.
+@future
+static void queryCases() {
+    for (Integer i = 0; i < 201; i++) {
+        Case c = [SELECT Id FROM Case];
+    }
+}
+```
+
+Too many DML statements:
+
+```java
+// 'System.LimitException: Too many DML statements: 151' will be thrown because max number of DML statements is equal to 150.
+static void insertCases() {
+    for (Integer i = 0; i < 151; i++) {
+        insert new Case();
+    }
+}
+```
+
+```java
+// 'System.LimitException: Too many SOSL queries: 21' will be thrown because max number of SOSL queries is equal to 20.
+static void queryCases() {
+    for (Integer i = 0; i < 21; i++) {
+        List<List<sObject>> sObjects = [FIND 'New' IN ALL FIELDS RETURNING Case(Status)];
+    }
+}
+```
+
+```java
+// 'System.LimitException: Too many DML rows: 10001' will be thrown because max number of records processed as a result of DML statements is equal to 10 000.
+static void insertCases() {
+    List<Case> cases = new List<Case>();
+    
+    for (Integer i = 0; i < 10001; i++) {
+        cases.add(new Case());
+    }
+    
+    insert cases;
+}
+```
+
 # #6 Apex Triggers.
 
 Apex Trigger is a code that executes before or after any operations are performed on the specific record.
