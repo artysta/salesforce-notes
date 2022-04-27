@@ -25,9 +25,12 @@ There are two main relationship types in Salesforce Lookup Relationship and Mast
             <td>a child of one master detail relationship cannot be the parent of another one</td>
         </tr>
         <tr>
-            <td>no impact on a security and 
-		</td>
+            <td>no impact on a security and access</td>
             <td>access to a parent determines access to a children</td>
+        </tr>
+        <tr>
+            <td>-</td>
+            <td>the standard object cannot be on the detail side of a relationship with a custom object</td>
         </tr>
     </table>
 </center>
@@ -428,7 +431,7 @@ Here is really simple example, how this all works together in Apex:
 ```java
 public interface Tuningable {
     // Interface methods cannot have a body.
-	void tuning();
+    void tuning();
 }
 ```
 
@@ -446,7 +449,7 @@ public abstract class Vehicle {
         this.Color = color;
     }
     
-	// Abstract method that has to be implemented by the subclass. Abstract methods have no body.
+    // Abstract method that has to be implemented by the subclass. Abstract methods have no body.
     public abstract Integer getMaxSpeed();
     
     // Virtual method can (but not has to) be overridden by the subclass.
@@ -608,6 +611,8 @@ static void insertCases() {
 }
 ```
 
+Too many SOSL queries:
+
 ```java
 // 'System.LimitException: Too many SOSL queries: 21' will be thrown because max number of SOSL queries is equal to 20.
 static void queryCases() {
@@ -616,6 +621,8 @@ static void queryCases() {
     }
 }
 ```
+
+Too many DML rows:
 
 ```java
 // 'System.LimitException: Too many DML rows: 10001' will be thrown because max number of records processed as a result of DML statements is equal to 10 000.
@@ -722,21 +729,27 @@ There are also some variables, that allow you to access the records:
 
 # #7 Queues
 
-// TODO
+Since Queues can be the owners of the records, we can take advantage of this fact and only search for records that are owned by the Queue to which the user is assigned.
 
 ```java
-String userId = UserInfo.getUserId();
+String currentUserId = UserInfo.getUserId();
 
-// Get Queue using Current User Id.
-GroupMember groupMember = [SELECT Id, Group.Name, UserOrGroupId, GroupId
-			   FROM GroupMember
-			   WHERE UserOrGroupId = :userId
-			   LIMIT 1];
+// Get GroupMember records related to the current User (where the Group Type is Queue).
+List<GroupMember> groupMembers = [SELECT GroupId
+                                  FROM GroupMember
+                                  WHERE Group.Type = 'Queue'];
 
-// Get all cases where Queue is the owner.
-List<Case> cases = [SELECT Id, Status FROM Case WHERE OwnerId = :groupMember.GroupId];
+// Create set of the Queues Ids.
+Set<Id> currentUserQueuesIds = new Set<Id>();
 
-System.debug('Cases for Queue "' + groupMember.Group.Name + '": ' + cases);
+for (GroupMember member : groupMembers) {
+    currentUserQueuesIds.add(member.GroupId);
+}
+
+// Select records where the Queue related to the current User is the Owner.
+List<Case> cases = [SELECT Id, Owner.Name
+                    FROM Case
+                    WHERE OwnerId IN :currentUserQueuesIds];
 ```
 
 # #8 Schema class
