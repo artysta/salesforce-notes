@@ -130,7 +130,7 @@ SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account
 SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account WHERE Id = '0010900000iMM6FAAW'
 ```
 
-# #2 Batches & scheduled jobs.
+# #2 Batches, Scheduled Jobs & state.
 
 The idea of Apex batch jobs is to work on the huge number (thousands / millions) of records. Apex Batch class has to implement Database.Batchable<sObject> interface and its 3 methods:
 
@@ -179,6 +179,8 @@ OpportunitiesCleanerBatch oppCleanerBatch = new OpportunitiesCleanerBatch();
 Database.executeBatch(oppCleanerBatch);
 ```
 
+---
+
 The interface, that works really good with batches is Schedulable interface. It allows to schedule an instance of the Apex class to run at a specific time.
 
 Here is implementation of Schedulable interface that runs OpportunitiesCleanerBatch.
@@ -201,7 +203,142 @@ String sch = '00 45 6-22 ? * * *';
 System.schedule('Opportunities Cleaner Batch', sch, scheduledBatch);
 ```
 
-You can also use UI to do this: Setup -> Apex Jobs -> Apex Classes -> Schedule Apex. There you have to add job name, select proper class and choose specific time and how often you want the job to run.
+You can also use UI to do this: **Setup -> Apex Jobs -> Apex Classes -> Schedule Apex**. There you have to add job name, select proper class and choose specific time and how often you want the job to run.
+
+---
+
+As the Salesforce documentation says:
+
+> Each execution of a batch Apex job is considered a discrete transaction.
+
+Implementing **Database.Stateful** interface in the case of the batches allows to maintain state across the transactions.
+
+Example:
+
+Lets say that we have 1028 Case records in our Salesforce database. We have written a simple batch (this batch does nothing - I just want this example to be as simple as possible). This is how does it looks like:
+
+```java
+public class CasesBatch implements Database.Batchable<sObject> {
+    private Integer count = 0;    
+    
+    public Database.QueryLocator start(Database.BatchableContext context){
+        System.debug('count (start): ' + count);
+        String exampleQuery = 'SELECT Id FROM Case';
+        return Database.getQueryLocator(exampleQuery);
+    }
+    
+    public void execute(Database.BatchableContext context, List<sObject> scope){
+		this.count++;
+        System.debug('scope.size(): ' + scope.size());
+        System.debug('count (execute): ' + count);
+    }
+    
+    public void finish(Database.BatchableContext BC){
+        System.debug('count (finish): ' + count);
+    }
+}
+```
+
+Lest run our batch using the code below:
+
+```java
+Database.executeBatch(new CasesBatch());
+```
+
+We have got couple of logs:
+
+```cmd
+#1
+19:29:03:020 USER_DEBUG [5]|DEBUG|count (start): 0
+
+#2
+19:29:03:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:29:03:001 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#3
+19:29:03:002 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:29:03:002 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#4
+19:29:04:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:29:04:001 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#5
+19:29:04:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:29:04:001 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#6
+19:29:04:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:29:04:001 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#7
+19:29:04:001 USER_DEBUG [12]|DEBUG|scope.size(): 28
+19:29:04:001 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#8
+19:29:04:025 USER_DEBUG [17]|DEBUG|count (finish): 0
+```
+
+---
+
+Lets implement **Database.Stateful** interface now:
+
+```java
+public class CasesBatch implements Database.Batchable<sObject>, Database.Stateful {
+    private Integer count = 0;    
+    
+    public Database.QueryLocator start(Database.BatchableContext context){
+        System.debug('count (start): ' + count);
+        String exampleQuery = 'SELECT Id FROM Case';
+        return Database.getQueryLocator(exampleQuery);
+    }
+    
+    public void execute(Database.BatchableContext context, List<sObject> scope){
+		this.count++;
+        System.debug('scope.size(): ' + scope.size());
+        System.debug('count (execute): ' + count);
+    }
+    
+    public void finish(Database.BatchableContext BC){
+        System.debug('count (finish): ' + count);
+    }
+}
+```
+
+Lets run the batch again and check the logs:
+
+```cmd
+#1
+19:35:15:019 USER_DEBUG [5]|DEBUG|count (start): 0
+
+#2
+19:35:16:002 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:35:16:002 USER_DEBUG [13]|DEBUG|count (execute): 1
+
+#3
+19:35:16:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:35:16:001 USER_DEBUG [13]|DEBUG|count (execute): 2
+
+#4
+19:35:16:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:35:16:001 USER_DEBUG [13]|DEBUG|count (execute): 3
+
+#5
+19:35:16:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:35:16:001 USER_DEBUG [13]|DEBUG|count (execute): 4
+
+#6
+19:35:16:001 USER_DEBUG [12]|DEBUG|scope.size(): 200
+19:35:16:001 USER_DEBUG [13]|DEBUG|count (execute): 5
+
+#7
+19:35:16:001 USER_DEBUG [12]|DEBUG|scope.size(): 28
+19:35:16:001 USER_DEBUG [13]|DEBUG|count (execute): 6
+
+#8
+19:35:16:020 USER_DEBUG [17]|DEBUG|count (finish): 6
+
+```
 
 # #3 Some useful Apex code snippets.
 
