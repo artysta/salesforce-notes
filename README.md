@@ -600,7 +600,7 @@ public abstract class Vehicle {
 
 ```java
 // This is a virtual class so it can be extended by other classes. It also can be instantiated.
-public virtual class BaseCar extends Vehicle {
+public class BaseCar extends Vehicle {
     public Integer MaxSpeed { get; set; }
     
     // We can call super class constructor by using 'super' keyword - like in Java.
@@ -609,7 +609,6 @@ public virtual class BaseCar extends Vehicle {
         this.MaxSpeed = maxSpeed;
     }
     
-    // We can call super class method by using 'super' keyword - like in Java.
     public override Integer getMaxSpeed() {
         return this.MaxSpeed;
     }
@@ -617,7 +616,7 @@ public virtual class BaseCar extends Vehicle {
     // We can call super class method by using 'super' keyword - like in Java.
     // We have to use 'override' keyword if we want to override superclass method.
     public override String getInfo() {
-        return String.format('I am a {0} {1}. My max speed is km/h.',
+        return String.format('{0} My max speed is {1} km/h.',
                              new List<String> { super.getInfo(), String.valueOf(this.MaxSpeed) });
     }
 }
@@ -640,11 +639,18 @@ public class SportsCar extends BaseCar implements Tuningable {
         this.hasTurbo = hasTurbo;
     }
     
-    // We don't have to (and even cannot) use 'override' keyword if we are implementing interface method.
+    // We do not have to (and even cannot) use 'override' keyword if we are implementing interface method.
     public void tuning() {
         maxSpeed += 10;
     }
 }
+```
+
+###### Example:
+```java
+SportsCar car = new SportsCar('Nissan', 'Blue', 100, true);
+car.tuning();
+System.debug(car.getInfo()); // 20:48:36:017 USER_DEBUG [70]|DEBUG|I am a Blue Nissan. My max speed is 110 km/h.
 ```
 
 # #5 Apex Governor Limits.
