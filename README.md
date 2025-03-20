@@ -1,4 +1,4 @@
-# #1 Relationships & relationship SOQL queries examples.
+# 1. Relationships & relationship SOQL queries examples.
 
 There are two main relationship types in Salesforce Lookup Relationship and Master-Detail relationships. There are some differences betweent these relationships:
 
@@ -130,7 +130,7 @@ SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account
 SELECT Id, Name, (SELECT Name, Status FROM Entitlements) FROM Account WHERE Id = '0010900000iMM6FAAW'
 ```
 
-# #2 Batches, Scheduled Jobs & state.
+# 2. Batches, Scheduled Jobs & state.
 
 The idea of Apex batch jobs is to work on the huge number (thousands / millions) of records. Apex Batch class has to implement Database.Batchable<sObject> interface and its 3 methods:
 
@@ -340,7 +340,7 @@ Lets run the batch again and check the logs:
 
 ```
 
-# #3 Some useful Apex code snippets.
+# 3. Some useful Apex code snippets.
 
 - Send an email + debug.
 
@@ -394,7 +394,7 @@ List<SObject> opportunities = [SELECT Id, Name FROM Opportunity LIMIT 10];
 Set<Id> opportunitiesIds = (new Map<Id, SObject>(opportunities)).keySet();	
 ```
 
-# #4 Aura Components + Apex Controllers.
+# 4. Aura Components + Apex Controllers.
 
 Below you can find an Aura Component which is using Apex Controller to read and display data. It doesn't look so good, but it is one of the simplest examples. In this case data loads after clicking the **Get Opportunities** button.
 
@@ -501,7 +501,7 @@ Of course we can use datatable to achieve much better appearance. In this case t
 })
 ```
 
-# #5 Object Oriented Programming in Apex.
+# 5. Object Oriented Programming in Apex.
 
 What is Apex?
 
@@ -780,7 +780,7 @@ static void insertCases() {
 }
 ```
 
-# #6 Apex Triggers.
+# 6. Apex Triggers.
 
 Apex Trigger is a code that executes before or after any operations are performed on the specific record.
 
@@ -870,7 +870,7 @@ There are also some variables, that allow you to access the records:
     </table>
 </center>
 
-# #7 Queues
+# 7. Queues.
 
 Since Queues can be the owners of the records, we can take advantage of this fact and only search for records that are owned by the Queue to which the user is assigned.
 
@@ -895,7 +895,7 @@ List<Case> cases = [SELECT Id, Owner.Name
                     WHERE OwnerId IN :currentUserQueuesIds];
 ```
 
-# #8 Schema class
+# 8. Schema class.
 
 As the Salesforce documentation says Schema class:
 >Contains methods for obtaining schema describe information.
@@ -968,7 +968,7 @@ System.debug('SObject type: ' + describeResult.getSObjectType());
 11:08:36:015 USER_DEBUG [2]|DEBUG|SObject type: Account
 ```
 
-# #8 Apex data types.
+# 8. Apex data types.
 
 Primitive data types in Apex.
 
